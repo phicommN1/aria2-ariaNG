@@ -1,4 +1,4 @@
-FROM alpine
+FROM alpine:aarch64-edge
 
 ARG ARIANG_VERSION=1.0.0
 
