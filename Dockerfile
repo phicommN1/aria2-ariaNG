@@ -35,4 +35,4 @@ VOLUME /aria2/conf
 EXPOSE 6800
 EXPOSE 6880
 
-CMD ["/bin/sh", "./aria2c.sh" ]
+CMD ["/bin/bash", "./aria2c.sh" ]
