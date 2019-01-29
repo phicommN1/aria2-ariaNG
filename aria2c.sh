@@ -1,26 +1,29 @@
-conf_path=/aria2/conf
-conf_copy_path=/aria2/conf-copy
-data_path=/aria2/data
+#! /bin/bash -eu
 
-userid=0 # 65534 - nobody, 0 - root
-groupid=0
-
-if [ ! -f $conf_path/aria2.conf ]; then
-	cp $conf_copy_path/aria2.conf $conf_path/aria2.conf
-    if [ -n "$RPC_SECRET" ]; then
-        printf '\nrpc-secret=%s\n' ${RPC_SECRET} >> $conf_path/aria2.conf
-    fi
+echo "Run aria2c and ariaNG"
+if [ "$ENABLE_AUTH" = "true" ]; then
+  echo "Using Basic Auth config file "
+  CADDY_FILE=/usr/local/caddy/SecureCaddyfile
+else
+  echo "Using caddy without Basic Auth"
+  CADDY_FILE=/usr/local/caddy/Caddyfile
 fi
 
-touch ./conf/aria2.session
+if [ "$SSL" = "true" ]; then
+echo "Start aria2 with secure config"
 
-if [[ -n "$PUID" && -n  "$PGID" ]]; then
-    userid=$PUID
-    groupid=$PGID
+/usr/bin/aria2c --conf-path="/root/conf/aria2.conf" -D  \
+--enable-rpc --rpc-listen-all  \
+--rpc-certificate=/root/conf/key/aria2.crt \
+--rpc-private-key=/root/conf/key/aria2.key \
+--rpc-secret="$RPC_SECRET" --rpc-secure \
+&& caddy -quic --conf ${CADDY_FILE}
+
+else
+echo "Start aria2 with standard mode"
+/usr/bin/aria2c --conf-path="/root/conf/aria2.conf" -D \
+--enable-rpc --rpc-listen-all \
+&& caddy -quic --conf ${CADDY_FILE}
 fi
 
-chown -R $userid:$groupid $conf_path
-chown -R $userid:$groupid $data_path
 
-caddy -quiet -conf /usr/local/caddy/Caddyfile &
-su-exec $userid:$groupid aria2c --conf-path="$conf_path/aria2.conf"
