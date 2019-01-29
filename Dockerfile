@@ -1,6 +1,5 @@
 FROM alpine
 
-
 ARG ARIANG_VERSION=1.0.0
 
 #ENV RPC_SECRET=secret
