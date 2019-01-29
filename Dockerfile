@@ -1,40 +1,38 @@
 FROM arm64v8/alpine:edge
 
-WORKDIR /root
+ARG ARIANG_VERSION=1.0.0
 
-ENV RPC_SECRET=Hello
-ENV ENABLE_AUTH=false
+#ENV RPC_SECRET=secret
+ENV RPC_SECRET=""
 ENV DOMAIN=0.0.0.0:6880
-ENV ARIA2_USER=user
-ENV ARIA2_PWD=password
+ENV PUID=0
+ENV PGID=0
 
-#RUN apk update && apk add --no-cache --update wget bash openrc gnupg screen aria2 tar
 RUN apk update \
-    && apk add --no-cache --update caddy curl aria2 su-exec bash  openrc gnupg screen
-    
-#RUN curl https://getcaddy.com | bash -s personal http.filemanager
+    && apk add --no-cache --update caddy curl aria2 su-exec
 
-ADD conf /root/conf
-COPY aria2c.sh /root
+# AriaNG
+WORKDIR /usr/local/www/aria2
 
-COPY Caddyfile SecureCaddyfile /usr/local/caddy/
+RUN curl -sL https://github.com/mayswind/AriaNg/releases/download/${ARIANG_VERSION}/AriaNg-${ARIANG_VERSION}.zip \
+    --output ariang.zip \
+    && unzip ariang.zip \
+    && rm ariang.zip \
+    && chmod -R 755 ./
 
-RUN mkdir -p /usr/local/www && mkdir -p /usr/local/www/aria2
+WORKDIR /aria2
 
-#AriaNg
-RUN mkdir /usr/local/www/aria2/Download && cd /usr/local/www/aria2 \
- && chmod +rw /root/conf/aria2.session \
- && RUN curl -sL https://github.com/mayswind/AriaNg/releases/download/${ARIANG_VERSION}/AriaNg-${ARIANG_VERSION}.zip --output ariang.zip && unzip AriaNg.zip && rm -rf AriaNg.zip \
- && chmod -R 755 /usr/local/www/aria2 \
- && chmod +x /root/aria2c.sh
+COPY conf ./conf-copy
+COPY aria2c.sh ./
+COPY Caddyfile /usr/local/caddy/
 
-#The folder to store ssl keys
-VOLUME /root/conf/key
+RUN chmod +x aria2c.sh
+
 # User downloaded files
-VOLUME /data
+VOLUME /aria2/data
+VOLUME /aria2/conf
 
-EXPOSE 6800 6880 443
+EXPOSE 6800
+EXPOSE 6880
 
-CMD ["/bin/sh", "/root/aria2c.sh" ]
-
-
+CMD ["/bin/sh", "./aria2c.sh" ]
