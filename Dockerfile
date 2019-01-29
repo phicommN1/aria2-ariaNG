@@ -1,4 +1,4 @@
-FROM arm64v8/alpine:edge
+FROM arm64v8/alpine
 
 ARG ARIANG_VERSION=1.0.0
 
@@ -8,7 +8,7 @@ ENV DOMAIN=0.0.0.0:6880
 ENV PUID=0
 ENV PGID=0
 
-RUN /bin/bash -c apk update \
+RUN apk update \
     && apk add --no-cache --update caddy curl aria2 su-exec
 
 # AriaNG
