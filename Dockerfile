@@ -8,7 +8,7 @@ ENV DOMAIN=0.0.0.0:6880
 ENV PUID=0
 ENV PGID=0
 
-RUN apk update \
+RUN /bin/bash -c apk update \
     && apk add --no-cache --update caddy curl aria2 su-exec
 
 # AriaNG
