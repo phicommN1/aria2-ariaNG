@@ -1,4 +1,5 @@
-FROM alpine -> multiarch/alpine:aarch64-edge
+FROM alpine
+
 
 ARG ARIANG_VERSION=1.0.0
 
