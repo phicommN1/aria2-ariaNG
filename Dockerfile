@@ -8,7 +8,7 @@ ENV DOMAIN=0.0.0.0:6880
 ENV ARIA2_USER=user
 ENV ARIA2_PWD=password
 
-RUN apk update && apk add wget bash curl openrc gnupg screen aria2 tar --no-cache
+RUN apk update && apk add --no-cache --update wget bash openrc gnupg screen aria2 tar
 
 #RUN curl https://getcaddy.com | bash -s personal http.filemanager
 
